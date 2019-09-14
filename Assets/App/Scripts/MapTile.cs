@@ -1,4 +1,5 @@
 ﻿using HoloToolkitExtensions.RemoteAssets;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -51,5 +52,25 @@ public class MapTile : DynamicTextureDownloader
             southWest.Lat, southWest.Lon, northEast.Lat, northEast.Lon, _mapToken);
         _downloader = new WWW(urlData);
         IsDownloading = true;
+    }
+
+    protected override void OnUpdate()
+    {
+        ProcessElevationDataFromWeb();
+    }
+
+    private void ProcessElevationDataFromWeb()
+    {
+        if (TileData == null || _downloader == null)
+            return;
+
+        if (IsDownloading && _downloader.isDone)
+        {
+            IsDownloading = false;
+
+            var elevationData = JsonUtility.FromJson<ElevationResult>(_downloader.text);
+            if (elevationData == null)
+                return;
+        }
     }
 }

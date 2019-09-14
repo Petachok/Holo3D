@@ -1,6 +1,7 @@
 ﻿using HoloToolkitExtensions.RemoteAssets;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MapTile : DynamicTextureDownloader
@@ -72,5 +73,34 @@ public class MapTile : DynamicTextureDownloader
             if (elevationData == null)
                 return;
         }
+    }
+
+    private void ApplyElevationData(ElevationResult elevationData)
+    {
+        var threeDScale = TileData.ScaleFactor;
+
+        var resource = elevationData.resourceSets[0].resources[0];
+
+        var verts = new List<Vector3>();
+        var mesh = GetComponent<MeshFilter>().mesh;
+
+        for (int i = 0; i < mesh.vertexCount; i++)
+        {
+            var newPos = mesh.vertices[i];
+            newPos.y = resource.elevations[i] / threeDScale;
+            verts.Add(newPos);
+        }
+
+        RebuildMesh(mesh, verts);
+    }
+
+    private void RebuildMesh(Mesh mesh, List<Vector3> verts)
+    {
+        mesh.SetVertices(verts);
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        DestroyImmediate(gameObject.GetComponent<MeshCollider>());
+        var meshColider = gameObject.AddComponent<MeshCollider>();
+        meshColider.sharedMesh = mesh;
     }
 }

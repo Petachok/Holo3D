@@ -1,2 +1,2 @@
-# June2017HoloLensSetup
-Empty Hololens project setup demo (as of June 2017)
+# Holo3d
+3D Topographical Map in HoloLens With Bing Maps Elevation API.
